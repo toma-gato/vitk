@@ -1,0 +1,6 @@
+__pycache__
+registered.nrrd
+registered_brain_mask.nrrd
+registered_tumor_mask.nrrd
+fixed_brain_mask.nrrd
+fixed_tumor_mask.nrrd

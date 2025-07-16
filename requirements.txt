@@ -1,0 +1,4 @@
+itk>=5.3.0
+vtk>=9.2.0
+numpy>=1.21.0
+matplotlib>=3.5.0
