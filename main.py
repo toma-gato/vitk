@@ -47,13 +47,14 @@ def step_register(viz=False):
     if viz:
         visualize_volume_vtk(registered_image, "Registered Image")
 
-def step_segment(viz=False):
+def step_segment(viz=False, hardcode=None):
     print("SEGMENTATION...")
-    print("La segmentation est semi-automatique. Cliquer sur la tumeur dans l'interface.")
+    if hardcode is None :
+        print("La segmentation est semi-automatique. Cliquer sur la tumeur dans l'interface.")
 
     fixed_brain_mask = segment_brain(fixed_path)
     safe_itk_write(fixed_brain_mask, fixed_brain_mask_path)
-    fixed_tumor_mask, seed = segment_tumor(fixed_path)
+    fixed_tumor_mask, seed = segment_tumor(fixed_path, hardcode)
     safe_itk_write(fixed_tumor_mask, fixed_tumor_mask_path)
     registered_brain_mask = segment_brain(registered_path)
     safe_itk_write(registered_brain_mask, registered_brain_mask_path)
@@ -94,6 +95,7 @@ def parse_args():
     parser.add_argument("--step", choices=["register", "segment", "analyze", "viz"], help="Étape à exécuter")
     parser.add_argument("--all", action="store_true", help="Tout exécuter")
     parser.add_argument("--viz", action="store_true", help="Activer la visualisation à chaque étape")
+    parser.add_argument("--hardcodeseed", action="store_true", help="Utilise une valeur hardcode pour la seed de la tumeur")
     return parser.parse_args()
 
 def main():
@@ -101,16 +103,21 @@ def main():
 
     if not args.all and not args.step:
         args.all = True
+        args.hardcodeseed = True
+
+    seed = None
+    if args.hardcodeseed :
+        seed = (53, 63, 83)
 
     if args.all:
         step_register(viz=args.viz)
-        step_segment(viz=args.viz)
+        step_segment(viz=args.viz, hardcode=seed)
         step_analysis()
         step_visualization()
     elif args.step == "register":
         step_register(viz=args.viz)
     elif args.step == "segment":
-        step_segment(viz=args.viz)
+        step_segment(viz=args.viz, hardcode=seed)
     elif args.step == "analyze":
         step_analysis()
     elif args.step == "viz":
